@@ -1,8 +1,8 @@
 
 
-# zyan/laravel-sitemap
+# zyan/beautiful
 
-laravel框架 sitemap快速生成
+通用靓号检测 靓号正则规则
 
 ## 要求
 
@@ -12,76 +12,78 @@ laravel框架 sitemap快速生成
 ## 安装
 
 ```shell
-composer require zyan/laravel-sitemap -vvv
+composer require zyan/beautiful -vvv
 ```
 
 ## 使用
 
 ```php
-use Zyan\Sitemap\Sitemap;
+use Zyan\beautiful\beautiful;
 
-//path输出目录 不传默认为 public目录
-$path = public_path();
+Beautiful::go('15912345678');
 
-$sitemap = Factory::sitemap($path);
-$sitemap->table('表名')->where(['where条件 可不传'])->field(['字段'])->url('url规则')->make();
-
-//可生成多个表
-$sitemap->table('表名')->url('url规则')->make();
 ```
 
-table
+## 配置
 
 ```php
-//不需要填写前缀
-$sitemap->table('article')->make(); 
+
+Beautiful::config(['靓号规则 比如 AAAA AABB ABCD...'],['处理类型: mobile为手机号(只取后8位) 不传为通用,也就是对输入源不作任何处理']);
+
+//合并默认配置规则 也就是默认的规则上加上新的规则
+Beautiful::config(['AAAA','AAABBB','AABB'],['mobile']);
+
+//重新设置新规则 会复盖默认的规则
+Beautiful::setConfig(['AAAA','AAABBB','AABB'],['mobile']);
+
+//获取当前全局配置
+Beautiful::getConfig();
+
+//以上都是全局配置
+//如果某对某一次的检测单独设置请传入到后面
+Beautiful::go('15912345678',['AAAA','AAABBB','AABB'],['mobile']);
+
+```
+
+## 实现自已的规则
+
+您需要继承 `Zyan\Beautiful\RulesInterface`   
+实现 `public static function go(string $str): bool` 方法   
+示例如下:
+```php 
+namespace Zyan\Beautiful\Rules;
+
+
+use Zyan\Beautiful\RulesInterface;
+
+/**
+ * Class ABCDEF.
+ *
+ * @package Zyan\Beautiful\Rules
+ *
+ * @author 读心印 <aa24615@qq.com>
+ */
+class ABCDEF implements RulesInterface
+{
+    public static function go(string $str): bool
+    {
+        $isMatched = preg_match_all('/^\d(?:(?:0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9)|9(?=0)){5,})\d/m', $str, $matches);
+        return $isMatched>0 ? true : false;
+    }
+}
+```
+
+可使用 `Beautiful::setRules(string $name,RulesInterface $value)` 方法进行注入
+
+```php 
+Beautiful::setRules('ABCDEF',Zyan/Beautiful/Rules/ABCDEF:class); //这个class取决于您的命名空间
 ```
 
 
-where[可选]
 
-```php
-//请参考laravel手册中where传数组的方法 https://learnku.com/docs/laravel/8.5/queries/10404#ead379
-$sitemap->table('article')->where([['id','>',1000],['state','=',1]])->make(); 
-```
+## 实现自已的处理类型
 
-field
-```php
-//请参考laravel手册select传数组的方法 https://learnku.com/docs/laravel/8.5/queries/10404#bb14ff
-$sitemap->table('article')->field(['id','...'])->make();
-```
 
-url
-
-```php
-//配合field字段为变量替换url 请用{}括起来
-$sitemap->table('article')->field(['id'])->url('/article/{uid}.html')->make();
-//可以有多个
-$sitemap->table('article')->field(['id','type'])->url('/article/{type}/{uid}.html')->make();
-//也可以指定域名 不指定默认以 读取 config('app.url') 
-$sitemap->table('article')->field(['id','type'])->url('http://www.php.net/article/{id}.html')->make();
-```
-
-make
-```php
-//开始生成
-$sitemap->table('article')->field(['id'])->url('/user/{id}.html')->make();
-```
-
-## 生成结果
-暂时仅支持txt格式 /sitemap/map.txt 为索引文件对应下面的url  请将这里的网址添加到百度站长即可 
-```json
-http://www.php.net/sitemap/article_1.txt
-http://www.php.net/sitemap/article_2.txt
-http://www.php.net/sitemap/article_3.txt
-...
-```
-/sitemap/表名_分页.txt      
-/sitemap/article_1.txt      
-/sitemap/article_2.txt      
-/sitemap/article_3.txt          
-
-> 以上是默认目录的生成结果,如果您指定了目录,请自行修改上传后对应该路径
 
 ## 参与贡献
 

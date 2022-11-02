@@ -8,7 +8,7 @@ use Zyan\Beautiful\Beautiful;
 class BeautifulTest extends TestCase
 {
     public function test_go(){
-        $a = Beautiful::go('159176571212485',['aaaa'],['mobile']);
+        $a = Beautiful::go('15912345678',['ABCDEF'],['mobile']);
 
         print_r($a);
 
