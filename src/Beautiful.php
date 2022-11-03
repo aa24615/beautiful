@@ -1,10 +1,10 @@
 <?php
 
-
 namespace Zyan\Beautiful;
 
 use Zyan\Beautiful\Exception\HandleException;
 use Zyan\Beautiful\Exception\RulesException;
+use Zyan\Beautiful\Rules\AAAA;
 
 /**
  * Class Beautiful.
@@ -16,6 +16,13 @@ use Zyan\Beautiful\Exception\RulesException;
 
 class Beautiful
 {
+    protected static $rulesClass = [
+        'AAAA' => AAAA::class,
+    ];
+
+    protected static $handleClass = [
+
+    ];
 
     protected static $rules = [
         'AAAA'
@@ -25,14 +32,16 @@ class Beautiful
     /**
      * config.
      *
-     * @param array $config
+     * @param array $rules
      *
      * @return void
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    public static function config($config){
-        self::$config = array_merge(self::config,$config);
+    public static function config($rules,$handle=[])
+    {
+        self::$rules = array_merge(self::$rules, $rules);
+        self::$handle = array_merge(self::$handle, $handle);
     }
 
     /**
@@ -44,8 +53,10 @@ class Beautiful
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    public static function setConfig($config){
-        self::$config = $config;
+    public static function setConfig($rules,$handle=[])
+    {
+        self::$rules = $rules;
+        self::$handle = $handle;
     }
 
     /**
@@ -55,8 +66,12 @@ class Beautiful
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    public static function getConfig(){
-        return self::$config;
+    public static function getConfig()
+    {
+        return [
+            'rules' => self::$rules,
+            'handle' => self::$handle
+        ];
     }
 
     /**
@@ -69,24 +84,24 @@ class Beautiful
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    public static function go(string $str,array $rules = [], array $handle = []){
+    public static function go(string $str, array $rules = [], array $handle = [])
+    {
+        $rules = $rules ?: self::$rules;
+        $handle = $handle ?: self::$handle;
 
-        $rules = $rules ? : self::$rules;
-        $handle = $handle ? : self::$handle;
-
-        $str = self::handle($handle,$str);
+        $str = self::handle($handle, $str);
 
         var_dump($str);
 
         $data = [];
-        foreach ($rules as $rule){
+        foreach ($rules as $rule) {
             $ruleName = strtoupper($rule);
             $application = "\\Zyan\\Beautiful\\Rules\\$ruleName";
             try {
-                if($application::go($str)){
+                if ($application::go($str)) {
                     $data[] = $ruleName;
                 }
-            }catch (\Exception $exception){
+            } catch (\Exception $exception) {
                 throw new RulesException("Rules class cannot find name: {$application}");
             }
         }
@@ -104,12 +119,13 @@ class Beautiful
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    protected static function handle($handle,$str){
-        if(!$handle){
+    protected static function handle($handle, $str)
+    {
+        if (!$handle) {
             return $str;
         }
 
-        foreach ($handle as $name){
+        foreach ($handle as $name) {
             /**
              * @var HandleInterface
              */
@@ -117,16 +133,11 @@ class Beautiful
             $application = "\\Zyan\\Beautiful\\Handle\\$handleName";
             try {
                 $str = $application::handle($str);
-            }catch (\Exception $exception){
+            } catch (\Exception $exception) {
                 throw new HandleException($application);
             }
-
         }
 
         return $str;
-
     }
-
-
-
 }
