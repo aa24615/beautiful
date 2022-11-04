@@ -14,7 +14,6 @@ class BeautifulTest extends TestCase
         $this->assertSame(['AAAA','ABCDEF'], Beautiful::go('1591234567811111', ['AAAA','ABCDEF']));
         $this->assertSame([], Beautiful::go('15913412411', ['AAAA','ABCDEF']));
         $this->assertSame([], Beautiful::go('15913412411'));
-        $this->assertSame([], Beautiful::go('222233323222'));
 
         $this->assertTrue(true);
     }
