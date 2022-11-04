@@ -2,7 +2,8 @@
 
 # zyan/beautiful
 
-通用靓号检测 靓号正则规则
+这是一个通用靓号检测,手机靓号正则规则     
+可用于检测手机号,座机号,QQ号等数字类账号
 
 内置规则
 
@@ -42,7 +43,10 @@ Beautiful::go('15912345678');
 
 ```php
 
-Beautiful::config(['靓号规则 比如 AAAA AABB ABCD...'],['处理类型: mobile为手机号(只取后8位) 不传为通用,也就是对输入源不作任何处理']);
+Beautiful::config(
+    ['靓号规则 比如 AAAA AABB ABCD...'],
+    ['处理类型: mobile为手机号(只取后8位) 不传为通用,也就是对输入源不作任何处理']
+);
 
 //合并默认配置规则 也就是默认的规则上加上新的规则
 Beautiful::config(['AAAA','AAABBB','AABB'],['mobile']);
@@ -58,7 +62,7 @@ Beautiful::getConfig();
 Beautiful::go('15912345678',['AAAA','AAABBB','AABB'],['mobile']);
 
 ```
-## 匹配
+## 匹配靓号
 
 ```php
 Beautiful::go('15912345678');
