@@ -4,6 +4,20 @@
 
 通用靓号检测 靓号正则规则
 
+内置规则
+
+- [x] AAA
+- [x] AAAA
+- [x] AAAAA
+- [x] AAAAAA
+- [x] AABB
+- [x] AABBCC
+- [x] AABBCCDD
+- [x] ABABAB
+- [x] ABCDEF
+- [x] ABCABC
+- [x] ABCDABCD
+
 ## 要求
 
 1. php >= 7.2
@@ -44,6 +58,14 @@ Beautiful::getConfig();
 Beautiful::go('15912345678',['AAAA','AAABBB','AABB'],['mobile']);
 
 ```
+## 匹配
+
+```php
+Beautiful::go('15912345678');
+// ['ABCDEF'] 
+```
+
+返回命中规则 多个返回多个 未命中返回空数组
 
 ## 实现自已的规则
 
@@ -73,17 +95,18 @@ class ABCDEF implements RulesInterface
 }
 ```
 
-可使用 `Beautiful::setRules(string $name,RulesInterface $value)` 方法进行注入
+可使用 `Beautiful::setRules(string $name,RulesInterface $value)` 方法进行配置
 
 ```php 
 Beautiful::setRules('ABCDEF',Zyan/Beautiful/Rules/ABCDEF:class); //这个class取决于您的命名空间
 ```
 
+接下来您就可以使用了
 
-
-## 实现自已的处理类型
-
-
+```php
+Beautiful::go('15912345678',['ABCDEF']); //全局配置请用 Beautiful::Config(['ABCDEF'])
+// ['ABCDEF']
+```
 
 ## 参与贡献
 

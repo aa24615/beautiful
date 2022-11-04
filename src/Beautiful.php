@@ -2,9 +2,18 @@
 
 namespace Zyan\Beautiful;
 
-use Zyan\Beautiful\Exception\HandleException;
-use Zyan\Beautiful\Exception\RulesException;
+use Zyan\Beautiful\Handle\Mobile;
+use Zyan\Beautiful\Rules\AAA;
 use Zyan\Beautiful\Rules\AAAA;
+use Zyan\Beautiful\Rules\AAAAA;
+use Zyan\Beautiful\Rules\AAAAAA;
+use Zyan\Beautiful\Rules\AABB;
+use Zyan\Beautiful\Rules\AABBCC;
+use Zyan\Beautiful\Rules\AABBCCDD;
+use Zyan\Beautiful\Rules\ABABAB;
+use Zyan\Beautiful\Rules\ABCABC;
+use Zyan\Beautiful\Rules\ABCDABCD;
+use Zyan\Beautiful\Rules\ABCDEF;
 
 /**
  * Class Beautiful.
@@ -16,16 +25,42 @@ use Zyan\Beautiful\Rules\AAAA;
 
 class Beautiful
 {
+    /**
+     * @var array<string,RulesInterface>
+     */
     protected static $rulesClass = [
+        'AAA' => AAA::class,
         'AAAA' => AAAA::class,
+        'AAAAA' => AAAAA::class,
+        'AAAAAA' => AAAAAA::class,
+        'AABB' => AABB::class,
+        'AABBCC' => AABBCC::class,
+        'AABBCCDD' => AABBCCDD::class,
+        'ABABAB' => ABABAB::class,
+        'ABCDEF' => ABCDEF::class,
+        'ABCABC' => ABCABC::class,
+        'ABCDABCD' => ABCDABCD::class,
     ];
 
+    /**
+     * @var array<string,HandleInterface>
+     */
     protected static $handleClass = [
-
+        'mobile' => Mobile::class
     ];
 
     protected static $rules = [
-        'AAAA'
+        'AAA',
+        'AAAA',
+        'AAAAA',
+        'AAAAAA',
+        'AABB',
+        'AABBCC' ,
+        'AABBCCDD',
+        'ABABAB',
+        'ABCDEF',
+        'ABCABC',
+        'ABCDABCD',
     ];
 
     protected static $handle = [];
@@ -38,7 +73,7 @@ class Beautiful
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    public static function config($rules,$handle=[])
+    public static function config($rules, $handle = [])
     {
         self::$rules = array_merge(self::$rules, $rules);
         self::$handle = array_merge(self::$handle, $handle);
@@ -53,7 +88,7 @@ class Beautiful
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    public static function setConfig($rules,$handle=[])
+    public static function setConfig($rules, $handle = [])
     {
         self::$rules = $rules;
         self::$handle = $handle;
@@ -75,12 +110,26 @@ class Beautiful
     }
 
     /**
+     * setRules.
+     *
+     * @param
+     *
+     * @return void
+     *
+     * @author 读心印 <aa24615@qq.com>
+     */
+    public static function setRules(string $name, RulesInterface $rules)
+    {
+        self::$rulesClass[$name] = $rules;
+    }
+
+    /**
      * go.
      *
      * @param string $str
      * @param array $config
      *
-     * @return
+     * @return array
      *
      * @author 读心印 <aa24615@qq.com>
      */
@@ -91,18 +140,15 @@ class Beautiful
 
         $str = self::handle($handle, $str);
 
-        var_dump($str);
-
         $data = [];
         foreach ($rules as $rule) {
             $ruleName = strtoupper($rule);
-            $application = "\\Zyan\\Beautiful\\Rules\\$ruleName";
-            try {
-                if ($application::go($str)) {
+            if (isset(self::$rulesClass[$ruleName])) {
+                if (self::$rulesClass[$ruleName]::go($str)) {
                     $data[] = $ruleName;
                 }
-            } catch (\Exception $exception) {
-                throw new RulesException("Rules class cannot find name: {$application}");
+            } else {
+                throw new \Exception("Rules class cannot find name: {$ruleName}");
             }
         }
 
@@ -126,15 +172,11 @@ class Beautiful
         }
 
         foreach ($handle as $name) {
-            /**
-             * @var HandleInterface
-             */
-            $handleName = ucfirst($name);
-            $application = "\\Zyan\\Beautiful\\Handle\\$handleName";
-            try {
-                $str = $application::handle($str);
-            } catch (\Exception $exception) {
-                throw new HandleException($application);
+            $handleName = strtolower($name);
+            if (isset(self::$handleClass[$handleName])) {
+                $str = self::$handleClass[$handleName]::handle($str);
+            } else {
+                throw new \Exception("Handle class cannot find name: {$handleName}");
             }
         }
 

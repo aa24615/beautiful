@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Zyan\Beautiful;
 
 /**
@@ -18,5 +17,5 @@ interface RulesInterface
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    public static function go(string $str):bool;
+    public static function go(string $str): bool;
 }

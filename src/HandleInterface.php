@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Zyan\Beautiful;
-
 
 interface HandleInterface
 {
@@ -15,5 +13,5 @@ interface HandleInterface
      *
      * @author 读心印 <aa24615@qq.com>
      */
-    public static function handle(string $str):string;
+    public static function handle(string $str): string;
 }
